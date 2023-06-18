@@ -1,0 +1,23 @@
+{
+  "address": {
+    "host": "127.0.0.1",
+    "port": 5561
+  },
+  "serde_protocol": "protobuf",
+  "auth": {
+    "mechanism": "PLAIN",
+    "plain": {
+      "username": "admin678",
+      "password": "4815162342"
+    },
+    "curve": {
+      "client": {
+        "public": "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID",
+        "secret": "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs"
+      },
+      "server": {
+        "public": "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7"
+      }
+    }
+  }
+}

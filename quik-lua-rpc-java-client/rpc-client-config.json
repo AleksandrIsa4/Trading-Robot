@@ -1,0 +1,14 @@
+{
+  "address": {
+    "host": "127.0.0.1",
+    "port": 5560
+  },
+  "serde_protocol": "protobuf",
+  "auth": {
+    "mechanism": "PLAIN",
+    "plain": {
+      "username": "test_user",
+      "password": "test_password"
+    }
+  }
+}
