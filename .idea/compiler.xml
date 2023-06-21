@@ -11,6 +11,9 @@
         <module name="robot-logic" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Trading-Robot" target="11" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
