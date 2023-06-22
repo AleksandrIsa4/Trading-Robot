@@ -2,32 +2,31 @@ package org.Isa4.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.Isa4.model.Transaction;
+import org.Isa4.service.TransactionService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
 @RequestMapping("msg")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class Controller {
 
-    @Autowired
-    private KafkaTemplate<Long, String> kafkaTemplate;
+    private final KafkaTemplate<Long, Transaction> kafkaTemplate;
 
-/*    @PostMapping
-    public void sendOrder(Long msgId, String msg){
-        kafkaTemplate.send("msg", msgId, msg);
-    }*/
+    private final TransactionService transactionService;
 
     @PostMapping
-    public void sendMsg(Long msgId, String msg){
-        ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send("msg", msgId, msg);
+        public Transaction sendMsg(@RequestBody Transaction dto){
+        ListenableFuture<SendResult<Long, Transaction>> future = kafkaTemplate.send("msg", dto.getId(), dto);
         future.addCallback(System.out::println, System.err::println);
         kafkaTemplate.flush();
+        return transactionService.save(dto);
     }
 }
