@@ -9,7 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class GetParamExResultPbSerdeTest extends AbstractPbDeserializationTest<qlua.rpc.GetParamEx.Result, GetParamEx.Result> {
+public class GetParamExAllResultPbSerdeTest extends AbstractPbDeserializationTest<qlua.rpc.GetParamEx.Result, GetParamEx.Result> {
 
     private static final String PARAM_TYPE = "1";
     private static final String PARAM_VALUE = "2";

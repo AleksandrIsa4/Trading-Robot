@@ -1,4 +1,4 @@
-package org.Isa4.config;
+package com.enfernuz.quik.lua.rpc.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongSerializer;
@@ -30,12 +30,12 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<Long, String> producerFactory() {
+    public ProducerFactory<Long, String> producerFactoryInformationTool() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<Long, String> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    public KafkaTemplate<Long, String> kafkaTemplateInformationTool() {
+        return new KafkaTemplate<>(producerFactoryInformationTool());
     }
 }

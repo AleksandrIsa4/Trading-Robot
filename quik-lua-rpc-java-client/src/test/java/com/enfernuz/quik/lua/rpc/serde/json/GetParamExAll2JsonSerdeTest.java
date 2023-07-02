@@ -5,7 +5,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
 @RunWith(Enclosed.class)
-public class GetParamEx2JsonSerdeTest {
+public class GetParamExAll2JsonSerdeTest {
 
     public static class RpcArgsSerializationTest extends AbstractJsonRpcArgsSerializationTest<GetParamEx2.Args> {
 

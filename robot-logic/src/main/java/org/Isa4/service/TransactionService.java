@@ -11,8 +11,8 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    public Transaction save(Transaction transaction){
-        Transaction t=transactionRepository.save(transaction);
+    public Transaction save(Transaction transaction) {
+        Transaction t = transactionRepository.save(transaction);
         return t;
     }
 }

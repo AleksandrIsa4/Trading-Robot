@@ -15,6 +15,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Component;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 

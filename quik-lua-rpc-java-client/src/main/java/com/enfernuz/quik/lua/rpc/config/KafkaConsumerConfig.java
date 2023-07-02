@@ -1,4 +1,4 @@
-package org.Isa4.config;
+package com.enfernuz.quik.lua.rpc.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.LongDeserializer;
@@ -34,15 +34,15 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<?> kafkaListenerContainerFactory() {
+    public KafkaListenerContainerFactory<?> kafkaListenerContainerFactoryParamExAll() {
         ConcurrentKafkaListenerContainerFactory<Long, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(consumerFactoryParamExAll());
         return factory;
     }
 
     @Bean
-    public ConsumerFactory<Long, String> consumerFactory() {
+    public ConsumerFactory<Long, String> consumerFactoryParamExAll() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 }
