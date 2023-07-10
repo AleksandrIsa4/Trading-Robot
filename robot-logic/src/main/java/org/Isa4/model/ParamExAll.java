@@ -13,5 +13,4 @@ public class ParamExAll {
     String classCode;
 
     String secCode;
-
 }

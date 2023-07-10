@@ -22,8 +22,7 @@ public class ZmqTcpQluaRpcClientConfig {
         File configFile = null;
         try {
             configFile = new File(filePath);
-        } catch (
-                final Exception ex) {
+        } catch (final Exception ex) {
             log.error(String.format("Не удалось прочитать файл '%s'.", filePath), ex);
             System.exit(1);
         }
@@ -31,8 +30,7 @@ public class ZmqTcpQluaRpcClientConfig {
         ClientConfiguration config = null;
         try {
             config = JsonClientConfigurationReader.INSTANCE.read(configFile);
-        } catch (
-                final Exception ex) {
+        } catch (final Exception ex) {
             log.error(String.format("Не удалось получить объект конфигурации из файла '%s'.", filePath), ex);
             System.exit(1);
         }
@@ -49,7 +47,6 @@ public class ZmqTcpQluaRpcClientConfig {
             } else {
                 log.info("Результат выполнения удалённой процедуры 'message': {}.", result);
             }
-
             log.info("Выход из программы...");
         } catch (
                 final Exception ex) {

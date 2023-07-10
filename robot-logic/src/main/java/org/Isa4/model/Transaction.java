@@ -19,19 +19,19 @@ public class Transaction {
     @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "classCode")
+    @Column(name = "class_code")
     String classCode;
 
-    @Column(name = "secCode")
+    @Column(name = "sec_code")
     String secCode;
 
-    @Column(name = "clientCode")
+    @Column(name = "client_code")
     String clientCode;
 
     @Column(name = "status")
     Status status;
 
-    @Column(name = "operationType")
+    @Column(name = "operation_type")
     String operationType;
 
     @Column(name = "price")
@@ -40,6 +40,6 @@ public class Transaction {
     @Column(name = "quantity")
     Long quantity;
 
-    @Column(name = "quantityComplete")
+    @Column(name = "quantity_complete")
     Long quantityComplete;
 }
