@@ -1,15 +1,16 @@
 package com.enfernuz.quik.lua.rpc.consumer;
 
-import com.enfernuz.quik.lua.rpc.dto.InformationAccountResponse;
 import com.enfernuz.quik.lua.rpc.model.InformationTool;
-import com.enfernuz.quik.lua.rpc.model.ParamExAll;
-import com.enfernuz.quik.lua.rpc.model.PositionInstrument;
 import com.enfernuz.quik.lua.rpc.producer.ProducerRpc;
 import com.enfernuz.quik.lua.rpc.service.RpcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.Isa4.dto.InformationAccountDto;
+import org.Isa4.dto.InformationToolDto;
+import org.Isa4.dto.ParamExAll;
+import org.Isa4.dto.PositionInstrumentDto;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -47,10 +48,10 @@ public class ConsumerRpc {
     @KafkaListener(topics = TOPIC_GETITEM)
     public void consumeGetItem(String message) {
         try {
-            InformationAccountResponse informationAccountResponse = objectMapper.readValue(message, InformationAccountResponse.class);
+            InformationAccountDto informationToolDto = objectMapper.readValue(message, InformationAccountDto.class);
             log.info("consumeParam message {}", message);
-            log.info("consumeParam message informationAccountResponse {}", informationAccountResponse);
-            List<PositionInstrument> positionInstrumentList = rpcService.infoPositionInstrument(informationAccountResponse);
+            log.info("consumeParam message informationAccountResponse {}", informationToolDto);
+            List<PositionInstrumentDto> positionInstrumentList = rpcService.infoPositionInstrument(informationToolDto);
             producerRpc.sendPositionInstrument(positionInstrumentList);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());

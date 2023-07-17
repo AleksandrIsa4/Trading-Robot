@@ -1,11 +1,12 @@
 package com.enfernuz.quik.lua.rpc.producer;
 
 import com.enfernuz.quik.lua.rpc.model.InformationTool;
-import com.enfernuz.quik.lua.rpc.model.PositionInstrument;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.Isa4.dto.MoneyInfo;
+import org.Isa4.dto.PositionInstrumentDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,8 @@ public class ProducerRpc {
 
     private static final String TOPIC_POSITION_INSTRUMENT = "positionInstrument";
 
+    private static final String TOPIC_MONEY_INFO = "moneyInfo";
+
 
     public void sendInformationTool(@RequestBody InformationTool dto) {
         try {
@@ -38,7 +41,7 @@ public class ProducerRpc {
         }
     }
 
-    public void sendPositionInstrument(@RequestBody List<PositionInstrument> dto) {
+    public void sendPositionInstrument(@RequestBody List<PositionInstrumentDto> dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
             ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_POSITION_INSTRUMENT, json);
@@ -48,5 +51,13 @@ public class ProducerRpc {
         }
     }
 
-
+    public void sendMoneyInfo(@RequestBody MoneyInfo moneyInfo) {
+        try {
+            String json = objectMapper.writeValueAsString(moneyInfo);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_MONEY_INFO, json);
+            future.addCallback(System.out::println, System.err::println);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.toString());
+        }
+    }
 }

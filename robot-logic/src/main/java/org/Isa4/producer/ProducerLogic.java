@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.Isa4.dto.InformationAccountResponse;
+import org.Isa4.dto.InformationAccountDto;
+import org.Isa4.dto.ParamExAll;
 import org.Isa4.exceptions.BadRequestException;
-import org.Isa4.model.ParamExAll;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class ProducerLogic {
         }
     }
 
-    public LocalDateTime sendInformationTool(InformationAccountResponse dto) {
+    public LocalDateTime sendInformationTool(InformationAccountDto dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
             SendResult<Long, String> sendResult = kafkaTemplate.send(TOPIC_GETITEM, json).get();
@@ -49,7 +49,7 @@ public class ProducerLogic {
                     .atZone(ZoneId.systemDefault()).toLocalDateTime();
             return ldt;
         } catch (JsonProcessingException | ExecutionException | InterruptedException e) {
-            throw new BadRequestException("Исключение в методе sendInformationToo в классе ProducerLogicl");
+            throw new BadRequestException("Исключение в методе sendInformationToo в классе ProducerLogic");
         }
     }
 }

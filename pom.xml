@@ -18,6 +18,7 @@
     <modules>
         <module>quik-lua-rpc-java-client</module>
         <module>robot-logic</module>
+        <module>robot-logic/robot-dto</module>
     </modules>
 
     <properties>
@@ -36,7 +37,12 @@
             <artifactId>spring-kafka</artifactId>
             <version>2.9.9</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.26</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 </project>

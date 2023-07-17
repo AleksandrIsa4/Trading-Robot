@@ -1,8 +1,8 @@
 package com.enfernuz.quik.lua.rpc.mapper;
 
-import com.enfernuz.quik.lua.rpc.model.ParamExAll;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.Isa4.dto.ParamExAll;
 
 import java.util.Map;
 

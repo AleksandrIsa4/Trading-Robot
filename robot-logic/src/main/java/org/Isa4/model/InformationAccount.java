@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Entity
-@Table(name = "account", schema = "public")
+@Table(name = "information_account", schema = "public")
 @Builder
 public class InformationAccount {
 
@@ -26,4 +26,13 @@ public class InformationAccount {
 
     @Column(name = "class_code", nullable = false)
     String classCode;
+
+    @Column(name = "firm_id", nullable = false)
+    String firmId;
+
+    @Column(name = "tag_money", nullable = false)
+    String tagMoney;
+
+    @Column(name = "money")
+    float money;
 }

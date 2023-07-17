@@ -41,7 +41,7 @@ public final class GetMoney implements RemoteProcedure {
         private final String currCode;
 
         @Builder
-        private Args(
+        public Args(
                 @NonNull final String clientCode,
                 @NonNull final String firmId,
                 @NonNull final String tag,

@@ -1,4 +1,4 @@
-package com.enfernuz.quik.lua.rpc.model;
+package org.Isa4.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,13 +8,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Builder
-public class InformationTool {
+public class InformationToolDto {
 
     String secCode;
 
     String classCode;
-
-    Long lotSize;
 
     Float bid;
 
@@ -31,6 +29,4 @@ public class InformationTool {
     Float last;
 
     Float open;
-
-    Float secPriceStep;
 }

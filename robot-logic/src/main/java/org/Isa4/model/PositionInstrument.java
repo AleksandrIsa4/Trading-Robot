@@ -26,4 +26,10 @@ public class PositionInstrument {
 
     @Column(name = "average_price")
     Float averagePrice;
+
+    @Column(name = "lot_size", nullable = false)
+    Long lotSize;
+
+    @Column(name = "sec_price_step", nullable = false)
+    Float secPriceStep;
 }

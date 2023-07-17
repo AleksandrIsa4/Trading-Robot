@@ -9,8 +9,8 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/robot-logic/robot-dto/pom.xml" />
         <option value="$PROJECT_DIR$/robot-logic/robot-server/pom.xml" />
+        <option value="$PROJECT_DIR$/robot-logic/roboy-service/pom.xml" />
       </set>
     </option>
   </component>
