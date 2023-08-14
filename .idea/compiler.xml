@@ -7,12 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="quik-lua-rpc-java-client" />
         <module name="robot-logic" />
         <module name="robot-dto" />
+        <module name="qlua-rpc-client" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="quik-lua-rpc-java-client" target="11" />
       <module name="robot-server" target="11" />
       <module name="roboy-service" target="11" />
       <module name="Trading-Robot01" target="11" />
@@ -20,6 +21,8 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Trading-Robot" options="" />
+      <module name="qlua-rpc-client" options="-parameters" />
       <module name="quik-lua-rpc-java-client" options="-parameters" />
       <module name="robot-dto" options="-parameters" />
       <module name="robot-logic" options="-parameters" />

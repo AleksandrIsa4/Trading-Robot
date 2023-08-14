@@ -25,14 +25,16 @@ public class InstrumentService {
     @Value("${kafka.delay.second}")
     private long KAFKA_DELAY_SECOND;
 
-
     private final InformationAccountRepository informationAccountRepository;
-
 
     private final PositionInstrumentService positionInstrumentService;
 
     private final ProducerLogic producerLogic;
 
+    private final LogicService logicService;
+
+    // Получение информации о доступных акциях по информации аккаунта, задержка на KAFKA_DELAY_SECOND
+    // для передачи информации
     @Transactional
     public List<PositionInstrument> info(InformationAccount dtoAccount) {
         InformationAccountDto informationAccountDto = InformationAccountMapper.toDto(dtoAccount);
@@ -46,7 +48,7 @@ public class InstrumentService {
                     System.out.println(instrumentList);
                     return instrumentList;
                 }
-                    Thread.sleep(100);
+                Thread.sleep(100);
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new BadRequestException("Исключение в методе info в классе InstrumentService из-за ошибки");
@@ -54,10 +56,13 @@ public class InstrumentService {
         throw new BadRequestException("Исключение в методе info в классе InstrumentService из-за задержки получения сообщения");
     }
 
+    // Сохранить информацию об аккаунте
     public void saveAccount(InformationAccount dtoAccount) {
+        logicService.setInformationAccount(dtoAccount);
         informationAccountRepository.save(dtoAccount);
     }
 
+    // Сохранить информацию об доступных средствах
     @Transactional
     public void saveMoney(MoneyInfo moneyInfo) {
         informationAccountRepository.saveMoney(moneyInfo.getMoney(), moneyInfo.getFirmId(), moneyInfo.getTagMoney(), moneyInfo.getClientCode());

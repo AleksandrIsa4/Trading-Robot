@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationAccountRequest;
 import org.Isa4.dto.ParamExAll;
+import org.Isa4.dto.TransactionDto;
 import org.Isa4.mapper.InformationAccountMapper;
 import org.Isa4.model.InformationAccount;
 import org.Isa4.model.PositionInstrument;
@@ -31,6 +32,7 @@ public class KafkaController {
 
     private final PositionInstrumentService positionInstrumentService;
 
+    // Отправка параметров
     @PostMapping
     public void sendParam(@RequestBody ParamExAll dto) {
         producerLogic.sendParam(dto);
@@ -53,9 +55,15 @@ public class KafkaController {
         return tradeAkziiService.saveTradeAkzii(dto);
     }
 
-    // Запись инструмента для торговли и первоначальные параметры
+    // Получение доступных средств на аккаунте
     @GetMapping(value = "/money")
     public Float getMoney(@RequestParam String account) {
         return positionInstrumentService.infoMoney(account);
+    }
+
+    // Подача заявки
+    @PostMapping(value = "/tradeOperation")
+    public void postTradeOperation(@RequestBody @NonNull TransactionDto dto) {
+        positionInstrumentService.additionTransactionAccount(dto);
     }
 }

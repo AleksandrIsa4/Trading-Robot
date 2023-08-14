@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationAccountDto;
 import org.Isa4.dto.ParamExAll;
+import org.Isa4.dto.TransactionDto;
 import org.Isa4.exceptions.BadRequestException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -31,6 +32,10 @@ public class ProducerLogic {
 
     private static final String TOPIC_GETITEM = "getItem";
 
+    private static final String TOPIC_TRANSACTION_DTO = "getTransactionDto";
+
+    private static Long keySend=1L;
+
     public void sendParam(@RequestBody ParamExAll dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
@@ -50,6 +55,16 @@ public class ProducerLogic {
             return ldt;
         } catch (JsonProcessingException | ExecutionException | InterruptedException e) {
             throw new BadRequestException("Исключение в методе sendInformationToo в классе ProducerLogic");
+        }
+    }
+
+    public void sendTransactionDto(@RequestBody TransactionDto dto) {
+        try {
+            String json = objectMapper.writeValueAsString(dto);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_TRANSACTION_DTO,3,keySend, json);
+            future.addCallback(System.out::println, System.err::println);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.toString());
         }
     }
 }

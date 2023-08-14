@@ -1,13 +1,19 @@
 package org.Isa4.service;
 
 import lombok.RequiredArgsConstructor;
-import org.Isa4.dto.MoneyInfo;
+import org.Isa4.dto.InformationToolDto;
 import org.Isa4.dto.PositionInstrumentDto;
+import org.Isa4.dto.TransactionDto;
 import org.Isa4.exceptions.DataNotFoundException;
+import org.Isa4.mapper.InformationToolMapper;
 import org.Isa4.mapper.PositionInstrumentMapper;
+import org.Isa4.mapper.TransactionMapper;
 import org.Isa4.model.InformationAccount;
+import org.Isa4.model.InformationTool;
 import org.Isa4.model.PositionInstrument;
+import org.Isa4.producer.ProducerLogic;
 import org.Isa4.repository.InformationAccountRepository;
+import org.Isa4.repository.InformationToolRepository;
 import org.Isa4.repository.PositionInstrumentRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -25,15 +31,21 @@ public class PositionInstrumentService {
 
     private final InformationAccountRepository informationAccountRepository;
 
+    private final InformationToolRepository informationToolRepository;
+
+    private final ProducerLogic producerLogic;
+
+    // Сохранить все доступные бумаги
     @Async
     @Transactional
     public void saveAllInstrumets(List<PositionInstrumentDto> instruments) {
-        List<PositionInstrument> instrumentList=instruments.stream()
+        List<PositionInstrument> instrumentList = instruments.stream()
                 .map(PositionInstrumentMapper::toEntity)
                 .collect(Collectors.toList());
         positionInstrumentRepository.saveAll(instrumentList);
     }
 
+    // Получить все доступные бумаги
     @Async
     @Transactional(readOnly = true)
     public CompletableFuture<List<PositionInstrument>> getAllInstrumets() {
@@ -41,9 +53,23 @@ public class PositionInstrumentService {
         return CompletableFuture.completedFuture(positionInstrumentList);
     }
 
+    // Получить доступных средств на счету
     @Transactional(readOnly = true)
     public Float infoMoney(String account) {
         InformationAccount informationAccount = informationAccountRepository.findById(account).orElseThrow(() -> new DataNotFoundException("Нет данного аккаунта"));
         return informationAccount.getMoney();
+    }
+
+    // Сохранить информацию об инструменте для дальнейшего использования
+    public void saveInformationTool(InformationToolDto informationToolDto) {
+        InformationTool informationTool = InformationToolMapper.toEntity(informationToolDto);
+        informationToolRepository.save(informationTool);
+    }
+
+    // Дополнить заявку необходимой информацией о счете
+    public void additionTransactionAccount(TransactionDto dto) {
+        InformationAccount informationAccount = informationAccountRepository.findFirstByOrderByAccountDesc();
+        dto = TransactionMapper.toAdditionAccount(dto, informationAccount);
+        producerLogic.sendTransactionDto(dto);
     }
 }

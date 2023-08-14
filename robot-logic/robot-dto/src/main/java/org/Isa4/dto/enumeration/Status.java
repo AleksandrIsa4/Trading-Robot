@@ -1,4 +1,4 @@
-package org.Isa4.model.enumeration;
+package org.Isa4.dto.enumeration;
 
 public enum Status {
 

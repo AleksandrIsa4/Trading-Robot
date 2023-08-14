@@ -3,10 +3,7 @@ package org.Isa4.model;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +26,8 @@ public class TradeAkzii {
 
     @Column(name = "quantity_second", nullable = false)
     long quantitySecond;
+
+    @OneToOne()
+    @JoinColumn(name = "position_instrument_sec_code")
+    PositionInstrument positionInstrument;
 }

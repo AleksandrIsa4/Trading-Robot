@@ -5,9 +5,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.Isa4.dto.InformationToolDto;
 import org.Isa4.dto.MoneyInfo;
 import org.Isa4.dto.PositionInstrumentDto;
-import org.Isa4.model.InformationTool;
 import org.Isa4.service.InstrumentService;
 import org.Isa4.service.PositionInstrumentService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -32,12 +32,14 @@ public class ConsumerLogic {
     private final PositionInstrumentService positionInstrumentService;
 
     private final InstrumentService instrumentService;
+
     @KafkaListener(topics = TOPIC_INFORMATION_TOOL)
     public void consumeInformationTool(String message) {
         try {
-            InformationTool informationTool = objectMapper.readValue(message, InformationTool.class);
+            InformationToolDto informationToolDto = objectMapper.readValue(message, InformationToolDto.class);
             log.info("consumeInformationTool message  {}", message);
-            log.info("consumeInformationTool informationTool {}", informationTool);
+            log.info("consumeInformationTool informationTool {}", informationToolDto);
+            positionInstrumentService.saveInformationTool(informationToolDto);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }

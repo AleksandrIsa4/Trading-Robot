@@ -18,7 +18,6 @@ public class MainService implements CommandLineRunner {
 
     private final InstrumentService instrumentService;
 
-
     public static void main(String[] args) {
         SpringApplication.run(MainService.class, args);
     }

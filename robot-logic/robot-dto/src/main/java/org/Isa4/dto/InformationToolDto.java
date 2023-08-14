@@ -3,6 +3,8 @@ package org.Isa4.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -29,4 +31,6 @@ public class InformationToolDto {
     Float last;
 
     Float open;
+
+    LocalDateTime createdTime;
 }

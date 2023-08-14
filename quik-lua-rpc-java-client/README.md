@@ -4,3 +4,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/Enfernuz/quik-lua-rpc-java-client/badge.svg?branch=master)](https://coveralls.io/github/Enfernuz/quik-lua-rpc-java-client)
 
 Пример Java-клиента к сервису 'quik-lua-rpc'.
+
+Ошибка
+[WARNING] No 'protocExecutable' parameter is configured, using the default: 'protoc'
+
+Решение
+

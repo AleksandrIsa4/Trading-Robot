@@ -3,10 +3,8 @@ package org.Isa4.model;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +16,7 @@ import javax.persistence.Table;
 public class InformationTool {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Long id;
 
@@ -50,4 +49,7 @@ public class InformationTool {
 
     @Column(name = "open", nullable = false)
     Float open;
+
+    @Column(name = "created_time")
+    LocalDateTime createdTime;
 }

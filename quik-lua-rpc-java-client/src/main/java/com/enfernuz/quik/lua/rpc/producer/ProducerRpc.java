@@ -1,10 +1,10 @@
 package com.enfernuz.quik.lua.rpc.producer;
 
-import com.enfernuz.quik.lua.rpc.model.InformationTool;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.Isa4.dto.InformationToolDto;
 import org.Isa4.dto.MoneyInfo;
 import org.Isa4.dto.PositionInstrumentDto;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,8 +30,9 @@ public class ProducerRpc {
 
     private static final String TOPIC_MONEY_INFO = "moneyInfo";
 
+    private static final String TOPIC_TRANSACTION_DTO = "getTransactionDto";
 
-    public void sendInformationTool(@RequestBody InformationTool dto) {
+    public void sendInformationTool(@RequestBody InformationToolDto dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
             ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_INFORMATION_TOOL, json);
@@ -60,4 +61,5 @@ public class ProducerRpc {
             System.out.println(e.toString());
         }
     }
+
 }

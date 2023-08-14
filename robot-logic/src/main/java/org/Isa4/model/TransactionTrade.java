@@ -2,7 +2,7 @@ package org.Isa4.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.Isa4.model.enumeration.Status;
+import org.Isa4.dto.enumeration.Status;
 
 import javax.persistence.*;
 
@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "transactions", schema = "public")
 @Builder
-public class Transaction {
+public class TransactionTrade {
 
     @Id
     @Column(name = "id", nullable = false)
