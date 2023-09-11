@@ -14,6 +14,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.IOException;
 import java.util.List;
@@ -83,6 +85,7 @@ public final class ZmqTcpQluaEventProcessor implements TcpQluaEventProcessor, Zm
         return eventPoller.getAuthContext();
     }
 
+    @Scheduled(fixedRate = 100)
     @Override
     public void process() throws QluaEventProcessingException {
 
@@ -181,6 +184,7 @@ public final class ZmqTcpQluaEventProcessor implements TcpQluaEventProcessor, Zm
         }
     }
 
+    @Async
     @Override
     public void process(int maxEvents) {
 

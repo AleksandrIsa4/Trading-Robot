@@ -2,6 +2,7 @@ package org.Isa4.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -10,21 +11,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "information_tool", schema = "public")
-public class InformationTool {
+public class InformationTool extends BaseInfoTool {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Long id;
-
-    @Column(name = "sec_code", nullable = false)
-    String secCode;
-
-    @Column(name = "class_code", nullable = false)
-    String classCode;
 
     @Column(name = "bid", nullable = false)
     Float bid;

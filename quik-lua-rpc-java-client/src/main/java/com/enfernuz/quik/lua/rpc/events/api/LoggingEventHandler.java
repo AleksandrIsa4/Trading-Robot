@@ -1,6 +1,7 @@
 package com.enfernuz.quik.lua.rpc.events.api;
 
 import com.enfernuz.quik.lua.rpc.api.structures.*;
+import com.enfernuz.quik.lua.rpc.service.ReplyQUIKservice;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,11 +126,14 @@ public enum LoggingEventHandler implements QluaEventHandler {
     @Override
     public void onTransReply(@NotNull final TransReply transReply) {
         LOGGER.info("onTransReply:\n{}", transReply);
+        ReplyQUIKservice.addTransReply(transReply);
+        System.out.println("onTransReply: {}    "+ transReply.toString());
     }
 
     @Override
     public void onParam(@NotNull final ParamEventInfo param) {
         LOGGER.info("onParam:\n{}", param);
+        System.out.println("onParam: {}    "+ param.toString());
     }
 
     @Override

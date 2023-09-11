@@ -37,6 +37,7 @@ public class ProducerRpc {
             String json = objectMapper.writeValueAsString(dto);
             ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_INFORMATION_TOOL, json);
             future.addCallback(System.out::println, System.err::println);
+            log.info("ProducerRpc sendInformationTool  dto {}", dto);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }
@@ -47,6 +48,7 @@ public class ProducerRpc {
             String json = objectMapper.writeValueAsString(dto);
             ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_POSITION_INSTRUMENT, json);
             future.addCallback(System.out::println, System.err::println);
+            log.info("ProducerRpc sendPositionInstrument  dto {}", dto);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }
@@ -57,6 +59,7 @@ public class ProducerRpc {
             String json = objectMapper.writeValueAsString(moneyInfo);
             ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_MONEY_INFO, json);
             future.addCallback(System.out::println, System.err::println);
+            log.info("ProducerRpc sendMoneyInfo  moneyInfo {}", moneyInfo);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }

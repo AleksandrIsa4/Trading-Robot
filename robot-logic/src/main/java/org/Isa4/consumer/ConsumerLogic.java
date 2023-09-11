@@ -33,12 +33,12 @@ public class ConsumerLogic {
 
     private final InstrumentService instrumentService;
 
+    @Async
     @KafkaListener(topics = TOPIC_INFORMATION_TOOL)
     public void consumeInformationTool(String message) {
         try {
             InformationToolDto informationToolDto = objectMapper.readValue(message, InformationToolDto.class);
-            log.info("consumeInformationTool message  {}", message);
-            log.info("consumeInformationTool informationTool {}", informationToolDto);
+            log.info("ConsumerLogic consumeInformationTool informationTool {}", informationToolDto);
             positionInstrumentService.saveInformationTool(informationToolDto);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
@@ -51,8 +51,7 @@ public class ConsumerLogic {
         try {
             List<PositionInstrumentDto> positionInstrumentList = objectMapper.readValue(message, new TypeReference<List<PositionInstrumentDto>>() {
             });
-            log.info("consumePositionInstrument message {}", message);
-            log.info("consumePositionInstrument  informationTool {}", positionInstrumentList);
+            log.info("ConsumerLogic consumePositionInstrument  informationTool {}", positionInstrumentList);
             positionInstrumentService.saveAllInstrumets(positionInstrumentList);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
@@ -65,8 +64,7 @@ public class ConsumerLogic {
         try {
             MoneyInfo moneyInfo = objectMapper.readValue(message, new TypeReference<MoneyInfo>() {
             });
-            log.info("consumePositionInstrument message {}", message);
-            log.info("consumePositionInstrument  informationTool {}", moneyInfo);
+            log.info("ConsumerLogic consumePositionInstrument  informationTool {}", moneyInfo);
             instrumentService.saveMoney(moneyInfo);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());

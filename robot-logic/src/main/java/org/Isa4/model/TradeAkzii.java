@@ -14,9 +14,8 @@ import javax.persistence.*;
 @Builder
 public class TradeAkzii {
 
-    @Id
-    @Column(name = "sec_code", nullable = false)
-    String secCode;
+    @EmbeddedId
+    BaseInfoToolKey pk;
 
     @Column(name = "buy_price", nullable = false)
     float buyPrice;
@@ -28,6 +27,9 @@ public class TradeAkzii {
     long quantitySecond;
 
     @OneToOne()
-    @JoinColumn(name = "position_instrument_sec_code")
+    @JoinColumns({
+            @JoinColumn(name = "sec_code"),
+            @JoinColumn(name = "class_code")
+    })
     PositionInstrument positionInstrument;
 }

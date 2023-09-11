@@ -1,6 +1,7 @@
 package org.Isa4.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationToolDto;
 import org.Isa4.dto.PositionInstrumentDto;
 import org.Isa4.dto.TransactionDto;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PositionInstrumentService {
@@ -39,6 +41,7 @@ public class PositionInstrumentService {
     @Async
     @Transactional
     public void saveAllInstrumets(List<PositionInstrumentDto> instruments) {
+        log.info("PositionInstrumentService saveAllInstrumets  instruments {}", instruments);
         List<PositionInstrument> instrumentList = instruments.stream()
                 .map(PositionInstrumentMapper::toEntity)
                 .collect(Collectors.toList());
@@ -49,6 +52,7 @@ public class PositionInstrumentService {
     @Async
     @Transactional(readOnly = true)
     public CompletableFuture<List<PositionInstrument>> getAllInstrumets() {
+        log.info("PositionInstrumentService getAllInstrumets");
         List<PositionInstrument> positionInstrumentList = positionInstrumentRepository.findAll();
         return CompletableFuture.completedFuture(positionInstrumentList);
     }
@@ -56,20 +60,24 @@ public class PositionInstrumentService {
     // Получить доступных средств на счету
     @Transactional(readOnly = true)
     public Float infoMoney(String account) {
+        log.info("PositionInstrumentService infoMoney  account {}", account);
         InformationAccount informationAccount = informationAccountRepository.findById(account).orElseThrow(() -> new DataNotFoundException("Нет данного аккаунта"));
         return informationAccount.getMoney();
     }
 
     // Сохранить информацию об инструменте для дальнейшего использования
     public void saveInformationTool(InformationToolDto informationToolDto) {
+        log.info("PositionInstrumentService saveInformationTool  informationToolDto {}", informationToolDto);
         InformationTool informationTool = InformationToolMapper.toEntity(informationToolDto);
         informationToolRepository.save(informationTool);
     }
 
     // Дополнить заявку необходимой информацией о счете
     public void additionTransactionAccount(TransactionDto dto) {
-        InformationAccount informationAccount = informationAccountRepository.findFirstByOrderByAccountDesc();
-        dto = TransactionMapper.toAdditionAccount(dto, informationAccount);
-        producerLogic.sendTransactionDto(dto);
+        log.info("PositionInstrumentService additionTransactionAccount  dto {}", dto);
+        InformationAccount informationAccount = informationAccountRepository.findFirstByOrderByAccountDesc().orElseThrow(() -> new DataNotFoundException("Нет актуальной информации в БД по аккаунту"));
+        ;
+        TransactionMapper.toAdditionAccount(dto, informationAccount);
+        producerLogic.sendTransactionDto(List.of(dto));
     }
 }

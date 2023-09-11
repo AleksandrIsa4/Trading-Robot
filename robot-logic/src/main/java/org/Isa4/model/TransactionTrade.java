@@ -2,6 +2,7 @@ package org.Isa4.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.Isa4.dto.enumeration.Status;
 
 import javax.persistence.*;
@@ -12,18 +13,12 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "transactions", schema = "public")
-@Builder
-public class TransactionTrade {
+@SuperBuilder
+public class TransactionTrade extends BaseInfoTool {
 
     @Id
     @Column(name = "id", nullable = false)
     Long id;
-
-    @Column(name = "class_code")
-    String classCode;
-
-    @Column(name = "sec_code")
-    String secCode;
 
     @Column(name = "client_code")
     String clientCode;

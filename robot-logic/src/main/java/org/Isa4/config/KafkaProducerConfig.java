@@ -3,6 +3,7 @@ package org.Isa4.config;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -15,7 +16,8 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    private String kafkaServer = "localhost:9092";
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String kafkaServer;
 
     @Bean
     public Map<String, Object> producerConfigs() {

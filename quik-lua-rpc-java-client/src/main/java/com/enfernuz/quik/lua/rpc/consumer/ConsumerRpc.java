@@ -3,12 +3,13 @@ package com.enfernuz.quik.lua.rpc.consumer;
 import com.enfernuz.quik.lua.rpc.producer.ProducerRpc;
 import com.enfernuz.quik.lua.rpc.service.RpcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.*;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,12 +31,13 @@ public class ConsumerRpc {
 
     private final ProducerRpc producerRpc;
 
+    private static int i = 0;
+
     @KafkaListener(topics = TOPIC_PARAM)
     public void consumeParam(String message) {
         try {
             ParamExAll paramExAll = objectMapper.readValue(message, ParamExAll.class);
-            log.info("consumeParam message {}", message);
-            log.info("consumeParam message paramExAll {}", paramExAll);
+            log.info("ConsumerRpc consumeParam paramExAll {}", paramExAll);
             InformationToolDto informationToolDto = rpcService.infoParamEx(paramExAll);
             System.out.println(informationToolDto);
             producerRpc.sendInformationTool(informationToolDto);
@@ -48,8 +50,7 @@ public class ConsumerRpc {
     public void consumeGetItem(String message) {
         try {
             InformationAccountDto informationToolDto = objectMapper.readValue(message, InformationAccountDto.class);
-            log.info("consumeParam message {}", message);
-            log.info("consumeParam message informationAccountResponse {}", informationToolDto);
+            log.info("ConsumerRpc consumeGetItem informationToolDto {}", informationToolDto);
             List<PositionInstrumentDto> positionInstrumentList = rpcService.infoPositionInstrument(informationToolDto);
             producerRpc.sendPositionInstrument(positionInstrumentList);
         } catch (JsonProcessingException e) {
@@ -57,13 +58,15 @@ public class ConsumerRpc {
         }
     }
 
-    @KafkaListener(topicPartitions =@TopicPartition(topic = TOPIC_TRANSACTION_DTO, partitions = "3"))
+    @Async
+    @KafkaListener(topics = TOPIC_TRANSACTION_DTO)
     public void consumeTransactionDto(String message) {
         try {
-            TransactionDto transactionDto = objectMapper.readValue(message, TransactionDto.class);
-            log.info("consumeParam message {}", message);
-            log.info("consumeParam message transactionDto {}", transactionDto);
-            String resultTransaction = rpcService.sendTrade(transactionDto);
+            System.out.println(i++);
+            List<TransactionDto> dtos = objectMapper.readValue(message, new TypeReference<List<TransactionDto>>() {
+            });
+            log.info("ConsumerRpc consumeTransactionDto dtos {}", dtos);
+            rpcService.parseTrade(dtos);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }

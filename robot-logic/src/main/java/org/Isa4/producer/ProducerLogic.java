@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
@@ -34,13 +35,14 @@ public class ProducerLogic {
 
     private static final String TOPIC_TRANSACTION_DTO = "getTransactionDto";
 
-    private static Long keySend=1L;
+    private static Long keySend = 1L;
 
     public void sendParam(@RequestBody ParamExAll dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
             ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_PARAM, json);
             future.addCallback(System.out::println, System.err::println);
+            log.info("ProducerLogic sendParam dto  {}", dto);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }
@@ -52,17 +54,19 @@ public class ProducerLogic {
             SendResult<Long, String> sendResult = kafkaTemplate.send(TOPIC_GETITEM, json).get();
             LocalDateTime ldt = Instant.ofEpochMilli(sendResult.getRecordMetadata().timestamp())
                     .atZone(ZoneId.systemDefault()).toLocalDateTime();
+            log.info("ProducerLogic sendInformationTool dto  {}", dto);
             return ldt;
         } catch (JsonProcessingException | ExecutionException | InterruptedException e) {
             throw new BadRequestException("Исключение в методе sendInformationToo в классе ProducerLogic");
         }
     }
 
-    public void sendTransactionDto(@RequestBody TransactionDto dto) {
+    public void sendTransactionDto(@RequestBody List<TransactionDto> dtos) {
         try {
-            String json = objectMapper.writeValueAsString(dto);
-            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_TRANSACTION_DTO,3,keySend, json);
+            String json = objectMapper.writeValueAsString(dtos);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_TRANSACTION_DTO, json);
             future.addCallback(System.out::println, System.err::println);
+            log.info("ProducerLogic sendTransactionDto dto  {}", dtos);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }

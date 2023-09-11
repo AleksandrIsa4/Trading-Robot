@@ -19,7 +19,8 @@ public class ProtobufSubscriptionExampleApplication {
 
     public static void main(final String[] args) {
 
-        final String filePath = args[0];
+        //  final String filePath = args[0];
+        final String filePath = "rpc-client-config.json";
         if (filePath == null) {
             log.error("Не задан путь до файла конфигурации.");
             return;
@@ -44,12 +45,13 @@ public class ProtobufSubscriptionExampleApplication {
 
         log.info("Инициализация клиента...");
         final ExecutorService stdinScannerExecutorService = Executors.newSingleThreadExecutor();
-        try (final ZmqTcpQluaEventProcessor eventProcessor = ZmqTcpQluaEventProcessor.newInstance(config, PollingMode.BLOCKING)) {
+       // try (final ZmqTcpQluaEventProcessor eventProcessor = ZmqTcpQluaEventProcessor.newInstance(config, PollingMode.BLOCKING)) {
+        try (final ZmqTcpQluaEventProcessor eventProcessor = ZmqTcpQluaEventProcessor.newInstance(config, PollingMode.NO_BLOCKING)) {
 
             log.info("Подписка на все события...");
-            //eventProcessor.subscribeToEverything();
-            eventProcessor.subscribe(QluaEvent.EventType.ON_FIRM);
-            eventProcessor.subscribe(QluaEvent.EventType.ON_MONEY_LIMIT);
+            eventProcessor.subscribeToEverything();
+          //  eventProcessor.subscribe(QluaEvent.EventType.ON_FIRM);
+        //    eventProcessor.subscribe(QluaEvent.EventType.ON_MONEY_LIMIT);
 
             log.info("Регистрация обработчиков событий...");
             eventProcessor.register(LoggingEventHandler.INSTANCE);

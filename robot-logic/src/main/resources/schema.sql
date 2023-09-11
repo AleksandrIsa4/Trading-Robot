@@ -1,7 +1,7 @@
 DROP table IF EXISTS transactions cascade;
 DROP table IF EXISTS position_instruments cascade;
 --DROP table IF EXISTS information_account cascade;
-DROP table IF EXISTS trade_akzii cascade;
+--DROP table IF EXISTS trade_akzii cascade;
 DROP table IF EXISTS information_tool cascade;
 
 CREATE TABLE IF NOT EXISTS transactions
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS position_instruments
     average_price  FLOAT               NOT NULL,
     lot_size       BIGINT              NOT NULL,
     sec_price_step FLOAT               NOT NULL,
-    CONSTRAINT pk_position_instruments PRIMARY KEY (sec_code)
+    CONSTRAINT pk_position_instruments PRIMARY KEY (class_code,sec_code)
 );
 
 CREATE TABLE IF NOT EXISTS information_account
@@ -42,13 +42,13 @@ CREATE TABLE IF NOT EXISTS information_account
 
 CREATE TABLE IF NOT EXISTS trade_akzii
 (
+    class_code                   VARCHAR(100)        NOT NULL,
     sec_code                     VARCHAR(100) UNIQUE NOT NULL,
     buy_price                    FLOAT               NOT NULL,
     quantity_first               BIGINT              NOT NULL,
     quantity_second              BIGINT              NOT NULL,
-    position_instrument_sec_code VARCHAR(100),
-    CONSTRAINT pk_trade_akzii PRIMARY KEY (sec_code),
-    CONSTRAINT fk_position_instrument_sec_code FOREIGN KEY (position_instrument_sec_code) REFERENCES position_instruments (sec_code)
+    CONSTRAINT pk_trade_akzii PRIMARY KEY (class_code,sec_code),
+    CONSTRAINT fk_trade_akzii FOREIGN KEY (class_code,sec_code) REFERENCES position_instruments (class_code,sec_code)
 );
 
 CREATE TABLE IF NOT EXISTS information_tool

@@ -15,11 +15,11 @@ public class TransactionDto {
 
     Long transNumber;
 
-    int orderGetItem;
+    Integer orderGetItem;
 
     Long orderNumber;
 
-    int transGetItem;
+    Integer transGetItem;
 
     String classCode;
 
@@ -33,13 +33,13 @@ public class TransactionDto {
 
     String operation;
 
-    String Type;
+    String type;
 
     float price;
 
-    int quantity;
+    long quantity;
 
-    int quantityComplete;
+    long quantityComplete;
 
     String account;
 }

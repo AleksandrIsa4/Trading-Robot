@@ -1,6 +1,7 @@
 package org.Isa4.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationAccountDto;
 import org.Isa4.dto.MoneyInfo;
 import org.Isa4.exceptions.BadRequestException;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InstrumentService {
@@ -35,8 +37,10 @@ public class InstrumentService {
 
     // Получение информации о доступных акциях по информации аккаунта, задержка на KAFKA_DELAY_SECOND
     // для передачи информации
+
     @Transactional
     public List<PositionInstrument> info(InformationAccount dtoAccount) {
+        log.info("InstrumentService info  dtoAccount {}", dtoAccount);
         InformationAccountDto informationAccountDto = InformationAccountMapper.toDto(dtoAccount);
         LocalDateTime ldt = producerLogic.sendInformationTool(informationAccountDto);
         try {
@@ -48,7 +52,7 @@ public class InstrumentService {
                     System.out.println(instrumentList);
                     return instrumentList;
                 }
-                Thread.sleep(100);
+                Thread.sleep(1000);
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new BadRequestException("Исключение в методе info в классе InstrumentService из-за ошибки");
@@ -58,6 +62,7 @@ public class InstrumentService {
 
     // Сохранить информацию об аккаунте
     public void saveAccount(InformationAccount dtoAccount) {
+        log.info("InstrumentService saveAccount  dtoAccount {}", dtoAccount);
         logicService.setInformationAccount(dtoAccount);
         informationAccountRepository.save(dtoAccount);
     }
@@ -65,6 +70,7 @@ public class InstrumentService {
     // Сохранить информацию об доступных средствах
     @Transactional
     public void saveMoney(MoneyInfo moneyInfo) {
+        log.info("InstrumentService saveMoney  moneyInfo {}", moneyInfo);
         informationAccountRepository.saveMoney(moneyInfo.getMoney(), moneyInfo.getFirmId(), moneyInfo.getTagMoney(), moneyInfo.getClientCode());
     }
 }

@@ -8,4 +8,6 @@ public class KafkaService {
     public void run() {
         System.out.println("Работает");
     }
+
+
 }

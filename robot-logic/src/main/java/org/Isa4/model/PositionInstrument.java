@@ -2,6 +2,7 @@ package org.Isa4.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -11,15 +12,11 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "position_instruments", schema = "public")
-@Builder
+@SuperBuilder
 public class PositionInstrument {
 
-    @Column(name = "class_code")
-    String classCode;
-
-    @Id
-    @Column(name = "sec_code", nullable = false)
-    String secCode;
+    @EmbeddedId
+    BaseInfoToolKey pk;
 
     @Column(name = "quantity")
     Long quantity;

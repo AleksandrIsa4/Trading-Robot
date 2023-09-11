@@ -16,8 +16,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>quik-lua-rpc-java-client</module>
         <module>robot-logic</module>
+        <module>quik-lua-rpc-java-client</module>
         <module>robot-logic/robot-dto</module>
     </modules>
 
