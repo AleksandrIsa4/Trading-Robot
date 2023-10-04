@@ -9,4 +9,8 @@ import java.util.Optional;
 public interface InformationToolRepository extends JpaRepository<InformationTool, Long> {
 
     Optional<InformationTool> findTop1BySecCodeAndAndCreatedTimeIsAfterOrderByCreatedTimeAsc(String secCode, LocalDateTime CreatedTime);
+
+    Long countBy();
+
+    void deleteByCreatedTimeIsBefore(LocalDateTime now);
 }

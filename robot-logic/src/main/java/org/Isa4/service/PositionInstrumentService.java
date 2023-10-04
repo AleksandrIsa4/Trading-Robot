@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ public class PositionInstrumentService {
     private final InformationToolRepository informationToolRepository;
 
     private final ProducerLogic producerLogic;
+
+    private static long sumRecord=0;
 
     // Сохранить все доступные бумаги
     @Async
@@ -65,11 +68,17 @@ public class PositionInstrumentService {
         return informationAccount.getMoney();
     }
 
+    @Transactional
     // Сохранить информацию об инструменте для дальнейшего использования
     public void saveInformationTool(InformationToolDto informationToolDto) {
         log.info("PositionInstrumentService saveInformationTool  informationToolDto {}", informationToolDto);
+        if(sumRecord>=40){
+            informationToolRepository.deleteByCreatedTimeIsBefore(LocalDateTime.now().minusSeconds(5));
+            sumRecord=0;
+        }
         InformationTool informationTool = InformationToolMapper.toEntity(informationToolDto);
         informationToolRepository.save(informationTool);
+        sumRecord++;
     }
 
     // Дополнить заявку необходимой информацией о счете

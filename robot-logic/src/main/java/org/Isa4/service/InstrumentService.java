@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationAccountDto;
 import org.Isa4.dto.MoneyInfo;
+import org.Isa4.dto.RunStatus;
+import org.Isa4.dto.constant.ModulConstans;
 import org.Isa4.exceptions.BadRequestException;
 import org.Isa4.mapper.InformationAccountMapper;
 import org.Isa4.model.InformationAccount;
 import org.Isa4.model.PositionInstrument;
 import org.Isa4.producer.ProducerLogic;
 import org.Isa4.repository.InformationAccountRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +25,7 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class InstrumentService {
 
-    @Value("${kafka.delay.second}")
-    private long KAFKA_DELAY_SECOND;
+    private long KAFKA_DELAY_SECOND= ModulConstans.DELAY_TIME;
 
     private final InformationAccountRepository informationAccountRepository;
 
@@ -33,18 +33,15 @@ public class InstrumentService {
 
     private final ProducerLogic producerLogic;
 
-    private final LogicService logicService;
-
     // Получение информации о доступных акциях по информации аккаунта, задержка на KAFKA_DELAY_SECOND
     // для передачи информации
-
     @Transactional
     public List<PositionInstrument> info(InformationAccount dtoAccount) {
         log.info("InstrumentService info  dtoAccount {}", dtoAccount);
         InformationAccountDto informationAccountDto = InformationAccountMapper.toDto(dtoAccount);
         LocalDateTime ldt = producerLogic.sendInformationTool(informationAccountDto);
         try {
-            while (LocalDateTime.now().isBefore(ldt.plusSeconds(KAFKA_DELAY_SECOND))) {
+            while (LocalDateTime.now().isBefore(ldt.plusSeconds(KAFKA_DELAY_SECOND))&& RunStatus.logicRun.get()) {
                 CompletableFuture<List<PositionInstrument>> listCompletableFuture = positionInstrumentService.getAllInstrumets();
                 List<PositionInstrument> instrumentList = listCompletableFuture.get();
                 if (!instrumentList.isEmpty()) {
@@ -52,6 +49,7 @@ public class InstrumentService {
                     System.out.println(instrumentList);
                     return instrumentList;
                 }
+                log.info("InstrumentService info while  dtoAccount {}", dtoAccount);
                 Thread.sleep(1000);
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -63,7 +61,7 @@ public class InstrumentService {
     // Сохранить информацию об аккаунте
     public void saveAccount(InformationAccount dtoAccount) {
         log.info("InstrumentService saveAccount  dtoAccount {}", dtoAccount);
-        logicService.setInformationAccount(dtoAccount);
+     //   logicService.setInformationAccount(dtoAccount);
         informationAccountRepository.save(dtoAccount);
     }
 

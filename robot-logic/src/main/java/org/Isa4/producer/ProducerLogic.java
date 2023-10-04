@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationAccountDto;
 import org.Isa4.dto.ParamExAll;
 import org.Isa4.dto.TransactionDto;
+import org.Isa4.dto.enumeration.Topics;
 import org.Isa4.exceptions.BadRequestException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,18 +31,12 @@ public class ProducerLogic {
 
     private final KafkaTemplate<Long, String> kafkaTemplate;
 
-    private static final String TOPIC_PARAM = "paramEx";
-
-    private static final String TOPIC_GETITEM = "getItem";
-
-    private static final String TOPIC_TRANSACTION_DTO = "getTransactionDto";
-
     private static Long keySend = 1L;
 
     public void sendParam(@RequestBody ParamExAll dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
-            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_PARAM, json);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_PARAM, json);
             future.addCallback(System.out::println, System.err::println);
             log.info("ProducerLogic sendParam dto  {}", dto);
         } catch (JsonProcessingException e) {
@@ -51,7 +47,7 @@ public class ProducerLogic {
     public LocalDateTime sendInformationTool(InformationAccountDto dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
-            SendResult<Long, String> sendResult = kafkaTemplate.send(TOPIC_GETITEM, json).get();
+            SendResult<Long, String> sendResult = kafkaTemplate.send(Topics.Constants.TOPIC_GETITEM, json).get();
             LocalDateTime ldt = Instant.ofEpochMilli(sendResult.getRecordMetadata().timestamp())
                     .atZone(ZoneId.systemDefault()).toLocalDateTime();
             log.info("ProducerLogic sendInformationTool dto  {}", dto);
@@ -64,11 +60,18 @@ public class ProducerLogic {
     public void sendTransactionDto(@RequestBody List<TransactionDto> dtos) {
         try {
             String json = objectMapper.writeValueAsString(dtos);
-            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_TRANSACTION_DTO, json);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_TRANSACTION_DTO, json);
             future.addCallback(System.out::println, System.err::println);
             log.info("ProducerLogic sendTransactionDto dto  {}", dtos);
         } catch (JsonProcessingException e) {
             System.out.println(e.toString());
         }
+    }
+
+    @Scheduled(fixedRate = 2000)
+    public void sendLogicRun() {
+        log.info("ProducerLogic sendLogicRun");
+        ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_LOGIC_RUN, "LOGIC_RUN");
+        future.addCallback(System.out::println, System.err::println);
     }
 }

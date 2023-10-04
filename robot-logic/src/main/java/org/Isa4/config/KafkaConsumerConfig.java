@@ -8,8 +8,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerContainerFactory;
+import org.springframework.kafka.config.*;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
@@ -41,11 +40,14 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<Long, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.getContainerProperties().setPollTimeout(500);
+        System.out.println("KafkaListenerContainerFactory конфиг");
         return factory;
     }
 
     @Bean
     public ConsumerFactory<Long, String> consumerFactory() {
+        System.out.println("ConsumerFactory конфиг");
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
@@ -54,5 +56,17 @@ public class KafkaConsumerConfig {
         Map<String, Object> configs = new HashMap<>();
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
         return new KafkaAdmin(configs);
+    }
+
+    @Bean(name = KafkaListenerConfigUtils.KAFKA_LISTENER_ENDPOINT_REGISTRY_BEAN_NAME)
+    public KafkaListenerEndpointRegistry defaultKafkaListenerEndpointRegistry() {
+        return new KafkaListenerEndpointRegistry() {
+            @Override
+            public void registerListenerContainer(KafkaListenerEndpoint endpoint,
+                                                  KafkaListenerContainerFactory<?> factory) {
+                System.out.println("in custom registry");
+                super.registerListenerContainer(endpoint, factory);
+            }
+        };
     }
 }

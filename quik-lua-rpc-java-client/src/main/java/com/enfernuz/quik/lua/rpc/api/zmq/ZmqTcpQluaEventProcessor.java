@@ -93,6 +93,7 @@ public final class ZmqTcpQluaEventProcessor implements TcpQluaEventProcessor, Zm
             final QluaEvent event = eventPoller.poll();
             if (event != null) {
                 final byte[] eventData = event.getData();
+                System.out.println("ZmqTcpQluaEventProcessor process event=  }"+event);
                 for (final QluaEventHandler eventHandler : eventHandlers) {
                     switch (event.getType()) {
                         case ON_STOP:
@@ -184,7 +185,7 @@ public final class ZmqTcpQluaEventProcessor implements TcpQluaEventProcessor, Zm
         }
     }
 
-    @Async
+  //  @Async
     @Override
     public void process(int maxEvents) {
 

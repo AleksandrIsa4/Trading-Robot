@@ -1,0 +1,47 @@
+name: Java CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Sources Checkout
+        uses: actions/checkout@v1
+      
+      - name: Cache Maven dependencies
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+            
+      - name: Cache Protobuf installation
+        uses: actions/cache@v1
+        id: protobuf_cache
+        with:
+          path: $HOME/protobuf
+          key: ${{ runner.os }}-protobuf-${{ hashFiles('**/.travis/install-protobuf.sh') }}
+            
+      - name: Set up Protobuf
+        if: steps.protobuf_cache.outputs.cache-hit != 'true'
+        run: |
+          chmod +x ./.travis/install-protobuf.sh
+          ./.travis/install-protobuf.sh
+          
+      - name: Update env
+        run: |
+          chmod +x $HOME/protobuf/bin/protoc
+          echo "$HOME/protobuf/bin" >> $GITHUB_PATH
+        shell: bash
+            
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Build with Maven
+        run: mvn -B package

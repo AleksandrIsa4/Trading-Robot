@@ -11,6 +11,7 @@ import com.enfernuz.quik.lua.rpc.producer.ProducerRpc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.*;
+import org.Isa4.dto.constant.ModulConstans;
 import org.Isa4.dto.enumeration.Status;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -19,10 +20,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 @Slf4j
 @EnableKafka
@@ -38,9 +38,11 @@ public class RpcService {
 
     private final Set<ParamExAll> paramExAllList;
 
-    @Value("${class.code}")
-    private String CLASS_CODE;
+    private static final long DELAY_TIME = ModulConstans.DELAY_TIME;
 
+    private static volatile Map<Long, TransactionDto> transactionDtoMap = new ConcurrentHashMap<>();
+
+    // TODO: Не используется
     public void info() {
         final Integer result = rpcClient.qlua_message("Hello, world!", Message.IconType.WARNING);
         if (result == null) {
@@ -50,11 +52,13 @@ public class RpcService {
         }
     }
 
+    // Добавление позиции инструмента в Set для отслеживания состояния
     public void postListParamEx(ParamExAll param) {
         log.info("RpcService postListParamEx");
         paramExAllList.add(param);
     }
 
+    // Периодическая отправка информации о состоянии отслеживаемых инструментах
     @Scheduled(fixedRate = 3000)
     public void getListParamEx() {
         log.info("RpcService getListParamEx");
@@ -111,9 +115,10 @@ public class RpcService {
 
     // Получение доступных средств на счете
     private InformationAccountDto infoMoney(InformationAccountDto informationAccountDto) {
-        log.info("RpcService infoMoney informationAccountDto {}", informationAccountDto);
+        log.info("RpcService infoMoney1 informationAccountDto {}", informationAccountDto);
         Money money = rpcClient.qlua_getMoney(new GetMoney.Args(informationAccountDto.getClientCode(), informationAccountDto.getFirmId(), informationAccountDto.getTagMoney(), "SUR"));
         informationAccountDto.setMoney(Float.parseFloat(money.getMoneyLimitAvailable()));
+        log.info("RpcService infoMoney2 informationAccountDto {}", informationAccountDto);
         return informationAccountDto;
     }
 
@@ -129,32 +134,62 @@ public class RpcService {
                 fullInstrument.add(instruments);
             }
         }
+        log.info("RpcService infoAkzii  fullInstrument={}", fullInstrument);
         return fullInstrument;
     }
 
+    // Отправка на терминал QUIK список транзакций
     public void parseTrade(List<TransactionDto> dtos) {
         dtos.forEach(this::sendTrade);
     }
 
-    @Async
+    // Периодическая проверка информации о состоянии текущих транзакций
+    @Scheduled(fixedRate = 5000)
+    private void checkOrderStatus() {
+        transactionDtoMap.values().forEach(this::checkOrder);
+        log.info("RpcService checkOrderStatus  transactionDtoMap={}", transactionDtoMap);
+    }
+
     // Отправка заявки
+    @Async
     public void sendTrade(TransactionDto transactionDto) {
         log.info("RpcService sendTrade  transactionDto {}", transactionDto);
         Map<String, String> transactionMap = TransactionRPCMapper.toMap(transactionDto);
         SendTransaction.Args sendTransaction = new SendTransaction.Args(transactionMap);
         String result = rpcClient.qlua_sendTransaction(sendTransaction);
-        log.info("Результат выполнения удалённой процедуры 'result': {}.", result);
+        log.info("RpcService sendTrade Результат выполнения удалённой процедуры 'result': {}.", result);
+        if (!result.isEmpty()) {
+            System.exit(-1);
+        }
         replyQUIKservice.getTransReply(transactionDto);
+        transactionDto = runTimeLoop(this::addOrder, transactionDto);
         log.info("Результат выполнения 'transactionDto': {}.", transactionDto);
-        checkTransaction(transactionDto);
-        log.info("Результат выполнения 'transactionDto': {}.", transactionDto);
+        producerRpc.sendTransactionLogic(transactionDto);
+    }
+
+    // Метод для проверки выполнения запроса на терминал QUIK по ограниченному времени
+    public TransactionDto runTimeLoop(Function<TransactionDto, Optional<TransactionDto>> function, TransactionDto transactionDto) {
+        LocalDateTime ldt = LocalDateTime.now();
+        Optional<TransactionDto> dto;
+        try {
+            while (LocalDateTime.now().isBefore(ldt.plusSeconds(DELAY_TIME))) {
+                log.info("RpcService runTimeLoop");
+                dto = function.apply(transactionDto);
+                if (dto.isPresent()) {
+                    return dto.get();
+                }
+                Thread.sleep(500);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.exit(1);
+        }
+        throw new RuntimeException("Исключение в методе runTimeLoop в классе RpcService из-за задержки получения сообщения");
     }
 
     // Добавление к заявки order_num,balance, orderGetItem
-    private TransactionDto addOrder(TransactionDto transactionDto) {
+    private Optional<TransactionDto> addOrder(TransactionDto transactionDto) {
         log.info("RpcService addOrder  transactionDto {}", transactionDto);
-        //     sleep();
-        log.info("Результат выполнения addOrder1 'transactionDto': {}.", transactionDto);
         int lineOrders = rpcClient.qlua_getNumberOf("orders");
         Map<String, String> instruments;
         for (int i = lineOrders - 1; i >= 0; i--) {
@@ -163,36 +198,41 @@ public class RpcService {
             if (instruments.get("trans_id").equals(transactionDto.getTransId().toString())) {
                 log.info("Результат выполнения addOrder 'instruments': {}.", instruments);
                 transactionDto.setOrderGetItem(i);
-                transactionDto.setQuantityComplete((int) Float.parseFloat(instruments.get("balance")));
+                transactionDto.setQuantityComplete(transactionDto.getQuantity() - (long) Float.parseFloat(instruments.get("balance")));
                 transactionDto.setOrderNumber(Long.parseLong(instruments.get("order_num")));
-                transactionDto.setStatus(Status.ACTIVE);
-                return transactionDto;
+                if (instruments.get("balance").equals("0.0")) {
+                    transactionDto.setStatus(Status.COMPLETED);
+                    transactionDto = runTimeLoop(this::checkTransaction, transactionDto);
+                } else {
+                    transactionDto.setStatus(Status.ACTIVE);
+                }
+                transactionDtoMap.put(transactionDto.getTransId(), transactionDto);
+                return Optional.of(transactionDto);
             }
         }
         log.info("Результат выполнения addOrder2 'transactionDto': {}.", transactionDto);
-        return transactionDto;
+        return Optional.empty();
+        //  return transactionDto;
     }
 
     // Проверка заявки на выполнение, заполнение quantityComplete (количество выполненных операций)
-    private TransactionDto checkOrder(TransactionDto transactionDto) {
+    private Optional<TransactionDto> checkOrder(TransactionDto transactionDto) {
         log.info("RpcService checkOrder  transactionDto {}", transactionDto);
-        //    sleep();
-        log.info("Результат выполнения checkOrder1 'transactionDto': {}.", transactionDto);
         Map<String, String> instruments = rpcClient.qlua_getItem("orders", transactionDto.getOrderGetItem());
         if (instruments.get("balance").equals("0.0")) {
             transactionDto.setStatus(Status.COMPLETED);
             transactionDto.setQuantityComplete(transactionDto.getQuantity());
-            return transactionDto;
+            transactionDto = runTimeLoop(this::checkTransaction, transactionDto);
+            return Optional.of(transactionDto);
         }
         long quantityComplete = transactionDto.getQuantity() - (long) Float.parseFloat(instruments.get("balance"));
         transactionDto.setQuantityComplete(quantityComplete);
-        log.info("Результат выполнения checkOrder2 'transactionDto': {}.", transactionDto);
-        return transactionDto;
+        log.info("RpcService checkOrder2 'transactionDto': {}.", transactionDto);
+        return Optional.of(transactionDto);
     }
 
-    // TODO: Не доделана
     // Проверка сделки
-    private TransactionDto checkTransaction(TransactionDto transactionDto) {
+    private Optional<TransactionDto> checkTransaction(TransactionDto transactionDto) {
         //    sleep();
         log.info("Результат выполнения checkTransaction1 'transactionDto': {}.", transactionDto);
         Map<String, String> instruments;
@@ -202,10 +242,12 @@ public class RpcService {
             if (instruments.get("order_num").equals(transactionDto.getOrderNumber().toString())) {
                 transactionDto.setTransGetItem(i);
                 transactionDto.setTransNumber(Long.parseLong(instruments.get("trade_num")));
-                return transactionDto;
+                producerRpc.sendTransactionLogic(transactionDto);
+                transactionDtoMap.remove(transactionDto.getTransId());
+                return Optional.of(transactionDto);
             }
         }
         log.info("Результат выполнения checkTransaction2 'transactionDto': {}.", transactionDto);
-        return transactionDto;
+        return Optional.empty();
     }
 }

@@ -7,8 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.Isa4.dto.InformationToolDto;
 import org.Isa4.dto.MoneyInfo;
 import org.Isa4.dto.PositionInstrumentDto;
+import org.Isa4.dto.TransactionDto;
+import org.Isa4.dto.enumeration.Topics;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,18 +27,11 @@ public class ProducerRpc {
 
     private final KafkaTemplate<Long, String> kafkaTemplate;
 
-    private static final String TOPIC_INFORMATION_TOOL = "informationTool";
-
-    private static final String TOPIC_POSITION_INSTRUMENT = "positionInstrument";
-
-    private static final String TOPIC_MONEY_INFO = "moneyInfo";
-
-    private static final String TOPIC_TRANSACTION_DTO = "getTransactionDto";
-
+    // Отправка информации об инструменте
     public void sendInformationTool(@RequestBody InformationToolDto dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
-            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_INFORMATION_TOOL, json);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_INFORMATION_TOOL, json);
             future.addCallback(System.out::println, System.err::println);
             log.info("ProducerRpc sendInformationTool  dto {}", dto);
         } catch (JsonProcessingException e) {
@@ -43,10 +39,11 @@ public class ProducerRpc {
         }
     }
 
+    // Отправка списка доступных инструментов
     public void sendPositionInstrument(@RequestBody List<PositionInstrumentDto> dto) {
         try {
             String json = objectMapper.writeValueAsString(dto);
-            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_POSITION_INSTRUMENT, json);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_POSITION_INSTRUMENT, json);
             future.addCallback(System.out::println, System.err::println);
             log.info("ProducerRpc sendPositionInstrument  dto {}", dto);
         } catch (JsonProcessingException e) {
@@ -54,10 +51,11 @@ public class ProducerRpc {
         }
     }
 
+    // Отправка информации о доступных денежных средств
     public void sendMoneyInfo(@RequestBody MoneyInfo moneyInfo) {
         try {
             String json = objectMapper.writeValueAsString(moneyInfo);
-            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(TOPIC_MONEY_INFO, json);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_MONEY_INFO, json);
             future.addCallback(System.out::println, System.err::println);
             log.info("ProducerRpc sendMoneyInfo  moneyInfo {}", moneyInfo);
         } catch (JsonProcessingException e) {
@@ -65,4 +63,23 @@ public class ProducerRpc {
         }
     }
 
+    // Отправка сообщения, что модуль работает
+    @Scheduled(fixedRate = 2000)
+    public void sendRpcRun() {
+        log.info("ProducerRpc sendRpcRun");
+        ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_RPC_RUN, "RPC_RUN");
+        future.addCallback(System.out::println, System.err::println);
+    }
+
+    // Отправка информации о состоянии транзакции
+    public void sendTransactionLogic(@RequestBody TransactionDto transactionDto) {
+        try {
+            String json = objectMapper.writeValueAsString(transactionDto);
+            ListenableFuture<SendResult<Long, String>> future = kafkaTemplate.send(Topics.Constants.TOPIC_TRANSACTION_LOGIC, json);
+            future.addCallback(System.out::println, System.err::println);
+            log.info("ProducerRpc sendTransactionDtoLogic transactionDto {}", transactionDto);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.toString());
+        }
+    }
 }

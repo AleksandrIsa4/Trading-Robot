@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 
 @Configuration
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 public class AsyncConfiguration extends AsyncConfigurerSupport {
 
     @Override
@@ -22,6 +22,7 @@ public class AsyncConfiguration extends AsyncConfigurerSupport {
         executor.setThreadNamePrefix("AsyncTaskThread::");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.initialize();
+        executor.setAwaitTerminationSeconds(1);
         return executor;
     }
 

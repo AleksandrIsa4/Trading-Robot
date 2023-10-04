@@ -1,6 +1,7 @@
 package org.Isa4;
 
 import lombok.RequiredArgsConstructor;
+import org.Isa4.client.RunClient;
 import org.Isa4.dto.ParamExAll;
 import org.Isa4.exceptions.DataNotFoundException;
 import org.Isa4.model.InformationAccount;
@@ -12,21 +13,19 @@ import org.Isa4.repository.PositionInstrumentRepository;
 import org.Isa4.repository.TradeAkziiRepository;
 import org.Isa4.service.InstrumentService;
 import org.Isa4.service.KafkaService;
-import org.Isa4.service.LogicService;
+import org.Isa4.service.impl.LogicServiceImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@EnableKafka
 @SpringBootApplication
 @RequiredArgsConstructor
 @EnableScheduling
-@EnableAsync
 public class MainService implements CommandLineRunner {
 
     private final InstrumentService instrumentService;
@@ -37,7 +36,9 @@ public class MainService implements CommandLineRunner {
 
     private final TradeAkziiRepository tradeAkziiRepository;
 
-    private final LogicService logicService;
+    //@Qualifier("logicServiceFirst")
+    @Qualifier("logicTestService")
+    private final LogicServiceImpl logicService;
 
     private final ProducerLogic producerLogic;
 
@@ -46,10 +47,19 @@ public class MainService implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication.run(MainService.class, args);
     }
+
     @Override
     public void run(String... args) throws InterruptedException {
-        kafkaService.cleanKafka();
-        Thread.sleep(5000);
+        kafkaService.createTopics();
+        LocalDateTime ldt = LocalDateTime.now();
+        while (!KafkaService.rpcRun.get() || KafkaService.rpcRun == null) {
+            System.out.println("Rpc модуль не подключен");
+            if (LocalDateTime.now().isAfter(ldt.plusSeconds(30))) {
+                System.out.println("Rpc модуль не подключился");
+                System.exit(-1);
+            }
+            Thread.sleep(1000);
+        }
         boolean isExist = informationAccountRepository.existsAllBy();
         if (!isExist) {
             System.out.println("Необходимо отправить информацию об аккаунте");

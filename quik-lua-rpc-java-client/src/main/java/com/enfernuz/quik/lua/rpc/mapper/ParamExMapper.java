@@ -6,6 +6,7 @@ import org.Isa4.dto.ParamExAll;
 
 import java.util.Map;
 
+// TODO: Не используется
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ParamExMapper {
 

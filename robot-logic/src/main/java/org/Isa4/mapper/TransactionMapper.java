@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.Isa4.dto.TransactionDto;
 import org.Isa4.model.InformationAccount;
+import org.Isa4.model.TransactionTrade;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,5 +41,19 @@ public final class TransactionMapper {
         dto.setAccount(informationAccount.getAccount());
         dto.setClientCode(informationAccount.getClientCode());
         return dto;
+    }
+
+    public static TransactionTrade toEntity(TransactionDto dto) {
+        return TransactionTrade.builder()
+                .id(dto.getTransId())
+                .classCode(dto.getClassCode())
+                .secCode(dto.getSecCode())
+                .clientCode(dto.getClientCode())
+                .status(dto.getStatus())
+                .operationType(dto.getOperation().equals("B") ? "BUY" : "SELL")
+                .price(dto.getPrice())
+                .quantity(dto.getQuantity())
+                .quantityComplete(dto.getQuantityComplete())
+                .build();
     }
 }

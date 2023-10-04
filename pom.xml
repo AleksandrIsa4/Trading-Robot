@@ -43,13 +43,20 @@
             <version>1.18.26</version>
             <optional>true</optional>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.23.4</version>
+        </dependency>
     </dependencies>
 
-    <build>
-        <pluginManagement>
+<!--    <build>
+&lt;!&ndash;        <pluginManagement>&ndash;&gt;
             <plugins>
 
-                <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+                &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin &ndash;&gt;
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -61,11 +68,16 @@
                     </configuration>
                 </plugin>
 
-                <!-- https://mvnrepository.com/artifact/org.xolstice.maven.plugins/protobuf-maven-plugin -->
+                &lt;!&ndash; https://mvnrepository.com/artifact/org.xolstice.maven.plugins/protobuf-maven-plugin &ndash;&gt;
                 <plugin>
                     <groupId>org.xolstice.maven.plugins</groupId>
                     <artifactId>protobuf-maven-plugin</artifactId>
                     <version>0.6.1</version>
+                    <configuration>
+                        <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
+                        <protocExecutable>E:\protoc\bin\protoc.exe</protocExecutable>
+                        <useArgumentFile>true</useArgumentFile>
+                    </configuration>
                     <executions>
                         <execution>
                             <goals>
@@ -76,7 +88,7 @@
                     </executions>
                 </plugin>
 
-                <!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
+  &lt;!&ndash;              &lt;!&ndash; https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin &ndash;&gt;
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
@@ -97,7 +109,7 @@
                     </executions>
                 </plugin>
 
-                <!-- https://mvnrepository.com/artifact/org.eluder.coveralls/coveralls-maven-plugin -->
+                &lt;!&ndash; https://mvnrepository.com/artifact/org.eluder.coveralls/coveralls-maven-plugin &ndash;&gt;
                 <plugin>
                     <groupId>org.eluder.coveralls</groupId>
                     <artifactId>coveralls-maven-plugin</artifactId>
@@ -105,9 +117,9 @@
                     <configuration>
                         <repoToken>${env.repoToken}</repoToken>
                     </configuration>
-                </plugin>
+                </plugin>&ndash;&gt;
             </plugins>
-        </pluginManagement>
-    </build>
+&lt;!&ndash;        </pluginManagement>&ndash;&gt;
+    </build>-->
 
 </project>

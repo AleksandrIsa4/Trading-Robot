@@ -24,6 +24,7 @@ public class TransactionTrade extends BaseInfoTool {
     String clientCode;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     Status status;
 
     @Column(name = "operation_type")
